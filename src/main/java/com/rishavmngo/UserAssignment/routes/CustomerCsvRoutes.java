@@ -1,25 +1,19 @@
-package com.rishavmngo.UserAssignment.controller;
+package com.rishavmngo.UserAssignment.routes;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
 import org.apache.camel.spi.DataFormat;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
-import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 
 @Component
-public class TestController extends RouteBuilder {
+public class CustomerCsvRoutes extends RouteBuilder {
 
 	@Autowired
 	private CustomerService customerService;
@@ -54,16 +48,16 @@ public class TestController extends RouteBuilder {
 				.bean(customerService, "SaveAll")
 				.end();
 
-		rest("/customers")
-				.produces("application/json")
-				.get("/getAll")
-				.to("direct:getAllCustomers");
+		// from("rest:/customers")
+		// .produces("application/json")
+		// .get("/getAll")
+		// .to("direct:getAllCustomers");
 
 		// Route to handle the REST endpoint
-		from("direct:getAllCustomers")
-				.bean(customerService, "getAll")
-				.marshal().json()
-				.end();
+		// from("direct:getAllCustomers")
+		// .bean(customerService, "getAll")
+		// .marshal().json()
+		// .end();
 
 		// from("rest:delete:deleteByFileName/{filename}")
 		// .bean("getCurrentTimeBean");

@@ -1,6 +1,9 @@
 package com.rishavmngo.UserAssignment.service.impl;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 		try {
 
-			List<CustomerEntity> customersSaved = customerRepository.saveAll(customers);
+			List<CustomerEntity> customersSaved = StreamSupport
+					.stream(customerRepository.saveAll(customers).spliterator(), false).collect(Collectors.toList());
 			System.out.println(customersSaved.size() + " Customers inserted");
 		} catch (Exception e) {
 
@@ -31,8 +35,28 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<CustomerEntity> getAll() {
-		return customerRepository.findAll();
+		List<CustomerEntity> customers = StreamSupport.stream(customerRepository.findAll().spliterator(), false)
+				.collect(Collectors.toList());
+		return customers;
 
+	}
+
+	@Override
+	public Optional<CustomerEntity> deleteById(Long id) {
+		Optional<CustomerEntity> optionalCustomer = customerRepository.findById(id);
+		if (optionalCustomer.isPresent()) {
+			customerRepository.deleteById(id);
+		}
+		return optionalCustomer;
+	}
+
+	@Override
+	public int deleteByFilename(String filename) {
+
+		List<CustomerEntity> customers = StreamSupport
+				.stream(customerRepository.findByFilename(filename).spliterator(), false).collect(Collectors.toList());
+		customerRepository.deleteByFilename(filename);
+		return customers.size();
 	}
 
 }

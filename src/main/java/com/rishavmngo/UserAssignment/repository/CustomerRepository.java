@@ -1,8 +1,10 @@
 package com.rishavmngo.UserAssignment.repository;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
@@ -10,10 +12,10 @@ import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface CustomerRepository extends CrudRepository<CustomerEntity, Long> {
+public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
 	@Query("SELECT c FROM CustomerEntity c WHERE c.fileName = :filename")
-	Iterable<CustomerEntity> findByFilename(String filename);
+	List<CustomerEntity> findByFilename(String filename);
 
 	@Modifying
 	@Transactional

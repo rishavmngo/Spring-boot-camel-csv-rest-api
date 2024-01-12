@@ -23,8 +23,11 @@ public class CustomerServiceImpl implements CustomerService {
 
 		try {
 
-			List<CustomerEntity> customersSaved = StreamSupport
-					.stream(customerRepository.saveAll(customers).spliterator(), false).collect(Collectors.toList());
+			// List<CustomerEntity> customersSaved = StreamSupport
+			// .stream(customerRepository.saveAll(customers).spliterator(),
+			// false).collect(Collectors.toList());
+
+			List<CustomerEntity> customersSaved = customerRepository.saveAll(customers);
 			System.out.println(customersSaved.size() + " Customers inserted");
 		} catch (Exception e) {
 
@@ -35,9 +38,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<CustomerEntity> getAll() {
-		List<CustomerEntity> customers = StreamSupport.stream(customerRepository.findAll().spliterator(), false)
-				.collect(Collectors.toList());
-		return customers;
+		// List<CustomerEntity> customers =
+		// StreamSupport.stream(customerRepository.findAll().spliterator(), false)
+		// .collect(Collectors.toList());
+		return customerRepository.findAll();
 
 	}
 
@@ -53,8 +57,10 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public int deleteByFilename(String filename) {
 
-		List<CustomerEntity> customers = StreamSupport
-				.stream(customerRepository.findByFilename(filename).spliterator(), false).collect(Collectors.toList());
+		// List<CustomerEntity> customers = StreamSupport
+		// .stream(customerRepository.findByFilename(filename).spliterator(),
+		// false).collect(Collectors.toList());
+		List<CustomerEntity> customers = customerRepository.findByFilename(filename);
 		customerRepository.deleteByFilename(filename);
 		return customers.size();
 	}

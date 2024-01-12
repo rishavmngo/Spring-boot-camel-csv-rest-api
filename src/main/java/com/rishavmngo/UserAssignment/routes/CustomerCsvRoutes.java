@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
+import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
+import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 
 @Component
@@ -19,10 +21,6 @@ public class CustomerCsvRoutes extends RouteBuilder {
 	public void configure() throws Exception {
 		DataFormat bind = new BindyCsvDataFormat(CustomerEntity.class);
 
-		// onException(UniqueConstraintException.class)
-		// .log("Unique constraint exception")
-		// .end();
-
 		// from("file:data/inbox?move=.done&moveFailed=.failed")
 		// .setHeader("CamelFileName", simple("${file:name.noext}"))
 		// .unmarshal(bind)
@@ -59,6 +57,27 @@ public class CustomerCsvRoutes extends RouteBuilder {
 		// exchange.getIn().setBody(customers);
 		// })
 		// .bean(customerService, "SaveAll")
+		// .end();
+
+		// onException(BadRequestException.class)
+		// .process(exhange -> {
+		// System.out.println("" +
+		// exhange.getIn().getBody(CustomerEntity.class).toString());
+		// })
+		// .handled(true)
+		// .end();
+
+		// from("file:data/inbox?move=.done&moveFailed=.failed")
+		// .setHeader("CamelFileName", simple("${file:name.noext}"))
+		// .unmarshal(bind)
+		// .split(body()) // Split the list of customers
+		// .process(exchange -> {
+		// CustomerEntity customer = exchange.getIn().getBody(CustomerEntity.class);
+		// String filename = exchange.getIn().getHeader("CamelFileName", String.class);
+		// customer.setFileName(filename);
+		// exchange.getIn().setBody(customer);
+		// })
+		// .bean(customerService, "addCustomer") // Save each customer individually
 		// .end();
 
 		from("file:data/inbox?move=.done&moveFailed=.failed")
@@ -69,9 +88,17 @@ public class CustomerCsvRoutes extends RouteBuilder {
 					CustomerEntity customer = exchange.getIn().getBody(CustomerEntity.class);
 					String filename = exchange.getIn().getHeader("CamelFileName", String.class);
 					customer.setFileName(filename);
-					exchange.getIn().setBody(customer);
+					try {
+						customerService.addCustomer(customer);
+						System.out.println("Customer with email " + customer.getEmail() + " added successfully");
+
+					} catch (Exception e) {
+
+						System.out.println("Customer with email " + customer.getEmail() + " added unsucessfully");
+
+						throw e;
+					}
 				})
-				.bean(customerService, "addCustomer") // Save each customer individually
 				.end();
 	}
 

@@ -8,7 +8,8 @@ import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
 
 public interface CustomerService {
 
-	void SaveAll(List<CustomerEntity> customers) throws UniqueConstraintException;
+	// void SaveAll(List<CustomerEntity> customers) throws
+	// UniqueConstraintException;
 
 	void addCustomer(CustomerEntity customer);
 

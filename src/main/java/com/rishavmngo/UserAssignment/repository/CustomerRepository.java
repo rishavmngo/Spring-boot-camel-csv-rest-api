@@ -1,6 +1,7 @@
 package com.rishavmngo.UserAssignment.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -21,4 +22,6 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> 
 	@Transactional
 	@Query("DELETE FROM CustomerEntity c WHERE c.fileName = :filename")
 	void deleteByFilename(String filename);
+
+	Optional<CustomerEntity> findByEmail(String email);
 }

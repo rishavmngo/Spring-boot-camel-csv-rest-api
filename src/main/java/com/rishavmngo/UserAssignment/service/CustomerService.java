@@ -10,6 +10,8 @@ public interface CustomerService {
 
 	void SaveAll(List<CustomerEntity> customers) throws UniqueConstraintException;
 
+	void addCustomer(CustomerEntity customer);
+
 	List<CustomerEntity> getAll();
 
 	Optional<CustomerEntity> deleteById(Long id);

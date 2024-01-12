@@ -2,13 +2,12 @@ package com.rishavmngo.UserAssignment.service.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
+import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
 import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
 import com.rishavmngo.UserAssignment.repository.CustomerRepository;
 import com.rishavmngo.UserAssignment.service.CustomerService;
@@ -23,10 +22,6 @@ public class CustomerServiceImpl implements CustomerService {
 
 		try {
 
-			// List<CustomerEntity> customersSaved = StreamSupport
-			// .stream(customerRepository.saveAll(customers).spliterator(),
-			// false).collect(Collectors.toList());
-
 			List<CustomerEntity> customersSaved = customerRepository.saveAll(customers);
 			System.out.println(customersSaved.size() + " Customers inserted");
 		} catch (Exception e) {
@@ -38,9 +33,6 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public List<CustomerEntity> getAll() {
-		// List<CustomerEntity> customers =
-		// StreamSupport.stream(customerRepository.findAll().spliterator(), false)
-		// .collect(Collectors.toList());
 		return customerRepository.findAll();
 
 	}
@@ -57,12 +49,23 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public int deleteByFilename(String filename) {
 
-		// List<CustomerEntity> customers = StreamSupport
-		// .stream(customerRepository.findByFilename(filename).spliterator(),
-		// false).collect(Collectors.toList());
 		List<CustomerEntity> customers = customerRepository.findByFilename(filename);
 		customerRepository.deleteByFilename(filename);
 		return customers.size();
 	}
 
+	@Override
+	public void addCustomer(CustomerEntity customer) {
+		Boolean emailExist = customerRepository.findByEmail(customer.getEmail()).isPresent();
+
+		if (emailExist) {
+			throw new BadRequestException(
+					"Email " + customer.getEmail() + " taken");
+
+		} else {
+
+			customerRepository.save(customer);
+		}
+
+	}
 }

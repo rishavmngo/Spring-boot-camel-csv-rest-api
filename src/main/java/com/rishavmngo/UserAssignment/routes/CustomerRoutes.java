@@ -23,7 +23,7 @@ public class CustomerRoutes extends RouteBuilder {
 				.get("/getAll")
 				.produces("application/json")
 				.to("direct:getAll")
-				.delete("/deleteById{id}")
+				.delete("/deleteById/{id}")
 				.to("direct:deleteById")
 				.delete("/deleteByFilename/{filename}")
 				.to("direct:deleteByFilename");

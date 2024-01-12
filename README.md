@@ -23,3 +23,5 @@
 | Get all customers            | /api/customers/getAll                      | GET    | Customers[]                       |
 | Delete a customers by id     | /api/customers/deleteById/{id}             | DELETE | Customer                          |
 | Delete customers by filename | /api/customers/deleteByFilename/{filename} | DELETE | String denoting customers deleted |
+
+_filename should be without the .csv extension_

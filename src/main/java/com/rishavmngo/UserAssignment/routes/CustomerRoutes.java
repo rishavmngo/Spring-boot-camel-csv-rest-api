@@ -1,24 +1,36 @@
 package com.rishavmngo.UserAssignment.routes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import com.rishavmngo.UserAssignment.CustomerUtils;
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 
 @Component
 public class CustomerRoutes extends RouteBuilder {
+
+	private static List<CustomerEntity> customers = new ArrayList<>();
+
+	static {
+		customers.add(CustomerUtils.createTestCustomerEntityA());
+		customers.add(CustomerUtils.createTestCustomerEntityB());
+	}
 	@Autowired
 	private CustomerService customerService;
 
 	@Override
 	public void configure() throws Exception {
 		restConfiguration().bindingMode(RestBindingMode.json);
+
 		rest("/customers")
 				.get("/getAll")
 				.produces("application/json")
@@ -27,6 +39,10 @@ public class CustomerRoutes extends RouteBuilder {
 				.to("direct:deleteById")
 				.delete("/deleteByFilename/{filename}")
 				.to("direct:deleteByFilename");
+
+		// rest().get("/getTest").to("direct:restGet");
+		//
+		// from("direct:restGet").bean(CustomerRoutes.class, "getAll");
 
 		from("direct:getAll")
 				.bean(customerService, "getAll");
@@ -57,6 +73,11 @@ public class CustomerRoutes extends RouteBuilder {
 						exchange.getIn().setBody("No items with filename: " + filename + " exist");
 					}
 				});
+
+	}
+
+	public List<CustomerEntity> getAll() {
+		return customers;
 	}
 
 }

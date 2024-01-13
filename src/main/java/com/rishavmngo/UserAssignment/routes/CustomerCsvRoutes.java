@@ -1,11 +1,16 @@
 package com.rishavmngo.UserAssignment.routes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
 import org.apache.camel.spi.DataFormat;
+import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.rishavmngo.UserAssignment.CustomerUtils;
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
 import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
@@ -81,6 +86,7 @@ public class CustomerCsvRoutes extends RouteBuilder {
 		// .end();
 
 		from("file:data/inbox?move=.done&moveFailed=.failed")
+				.routeId("csv-input")
 				.setHeader("CamelFileName", simple("${file:name.noext}"))
 				.unmarshal(bind)
 				.split(body()) // Split the list of customers
@@ -99,6 +105,7 @@ public class CustomerCsvRoutes extends RouteBuilder {
 						throw e;
 					}
 				})
+				.to("mock:result")
 				.end();
 	}
 

@@ -8,22 +8,14 @@ import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import com.rishavmngo.UserAssignment.CustomerUtils;
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 
 @Component
 public class CustomerRoutes extends RouteBuilder {
 
-	private static List<CustomerEntity> customers = new ArrayList<>();
-
-	static {
-		customers.add(CustomerUtils.createTestCustomerEntityA());
-		customers.add(CustomerUtils.createTestCustomerEntityB());
-	}
 	@Autowired
 	private CustomerService customerService;
 
@@ -74,10 +66,6 @@ public class CustomerRoutes extends RouteBuilder {
 					}
 				});
 
-	}
-
-	public List<CustomerEntity> getAll() {
-		return customers;
 	}
 
 }

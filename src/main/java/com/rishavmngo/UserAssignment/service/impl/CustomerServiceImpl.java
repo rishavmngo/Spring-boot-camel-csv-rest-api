@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
-import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
 import com.rishavmngo.UserAssignment.repository.CustomerRepository;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 

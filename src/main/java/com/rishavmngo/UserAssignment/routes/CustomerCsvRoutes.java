@@ -10,10 +10,8 @@ import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.rishavmngo.UserAssignment.CustomerUtils;
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
-import com.rishavmngo.UserAssignment.exceptions.UniqueConstraintException;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 
 @Component
@@ -105,8 +103,8 @@ public class CustomerCsvRoutes extends RouteBuilder {
 						throw e;
 					}
 				})
-				.to("mock:result")
 				.end();
+
 	}
 
 }

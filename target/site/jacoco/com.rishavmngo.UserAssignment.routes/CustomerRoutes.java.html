@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerRoutes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UserAssignment</a> &gt; <a href="index.source.html" class="el_package">com.rishavmngo.UserAssignment.routes</a> &gt; <span class="el_source">CustomerRoutes.java</span></div><h1>CustomerRoutes.java</h1><pre class="source lang-java linenums">package com.rishavmngo.UserAssignment.routes;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.camel.Exchange;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.model.rest.RestParamType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.rishavmngo.UserAssignment.domain.CustomerEntity;
+import com.rishavmngo.UserAssignment.service.CustomerService;
+
+import jakarta.activation.DataHandler;
+
+@Component
+<span class="fc" id="L26">public class CustomerRoutes extends RouteBuilder {</span>
+
+	@Autowired
+	private CustomerService customerService;
+
+	@Override
+	public void configure() throws Exception {
+<span class="fc" id="L33">		restConfiguration().bindingMode(RestBindingMode.json);</span>
+
+<span class="fc" id="L35">		rest(&quot;/customers&quot;)</span>
+<span class="fc" id="L36">				.get(&quot;/getAll&quot;)</span>
+<span class="fc" id="L37">				.produces(&quot;application/json&quot;)</span>
+<span class="fc" id="L38">				.to(&quot;direct:getAll&quot;)</span>
+<span class="fc" id="L39">				.delete(&quot;/deleteById/{id}&quot;)</span>
+<span class="fc" id="L40">				.to(&quot;direct:deleteById&quot;)</span>
+<span class="fc" id="L41">				.delete(&quot;/deleteByFilename/{filename}&quot;)</span>
+<span class="fc" id="L42">				.to(&quot;direct:deleteByFilename&quot;);</span>
+
+		// rest().get(&quot;/getTest&quot;).to(&quot;direct:restGet&quot;);
+		//
+		// from(&quot;direct:restGet&quot;).bean(CustomerRoutes.class, &quot;getAll&quot;);
+
+<span class="fc" id="L48">		from(&quot;direct:getAll&quot;)</span>
+<span class="fc" id="L49">				.bean(customerService, &quot;getAll&quot;);</span>
+
+<span class="fc" id="L51">		from(&quot;direct:deleteById&quot;)</span>
+<span class="fc" id="L52">				.process(exchange -&gt; {</span>
+
+<span class="fc" id="L54">					String id = exchange.getIn().getHeader(&quot;id&quot;, String.class);</span>
+<span class="fc" id="L55">					Optional&lt;CustomerEntity&gt; customer = customerService.deleteById(Long.parseLong(id));</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">					if (customer.isPresent())</span>
+<span class="fc" id="L57">						exchange.getIn().setBody(customer.get());</span>
+					else {
+<span class="fc" id="L59">						exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);</span>
+<span class="fc" id="L60">						exchange.getIn().setBody(&quot;Customer with id &quot; + id + &quot; don't exist&quot;);</span>
+					}
+<span class="fc" id="L62">				});</span>
+
+<span class="fc" id="L64">		from(&quot;direct:deleteByFilename&quot;)</span>
+<span class="fc" id="L65">				.process(exchange -&gt; {</span>
+
+<span class="fc" id="L67">					String filename = exchange.getIn().getHeader(&quot;filename&quot;, String.class);</span>
+<span class="fc" id="L68">					int size = customerService.deleteByFilename(filename);</span>
+<span class="fc" id="L69">					exchange.getIn().setBody(&quot;Customer with id &quot;);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">					if (size &gt; 0)</span>
+<span class="fc" id="L71">						exchange.getIn().setBody(size + &quot; items&quot; + &quot; deleted&quot;);</span>
+					else {
+<span class="fc" id="L73">						exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);</span>
+<span class="fc" id="L74">						exchange.getIn().setBody(&quot;No items with filename: &quot; + filename + &quot; exist&quot;);</span>
+					}
+<span class="fc" id="L76">				});</span>
+
+<span class="fc" id="L78">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -3,18 +3,29 @@
 ## Instructions
 
 1. Create a database "bank"
-    1. `psql -U postgres`
-    2. `create database bank;`
-2. run the application using `mvn spring-boot:run`
 
-## Check
+```bash
+psql -U postgres
+```
+
+```sql
+create database bank;
+```
+
+2. run the application using
+
+```bash
+mvn spring-boot:run
+```
+
+## Operations
 
 ### Add data from csv file
 
-1. go to data/inbox/.done folder for sample csv files
-2. while the application is running put the file in the inbox folder from .done folder.
-3. This will move the csv file from inbox to .done folder denoting successfull insertion and you can also see console for message
-4. If the file failed to insert data in database the file will move to .failed folder
+1. Go to `data/input` folder for sample csv files
+2. While the application is running put the file in the `data/inbox` folder.
+3. This will move the csv file from `data/inbox` to `data/inbox/.done` folder denoting successfull insertion and you can also see console for message
+4. If the file failed to insert data in database the file will move to .failed folder and throw error and print error message to console.
 
 ### Rest api
 
@@ -25,3 +36,11 @@
 | Delete customers by filename | /api/customers/deleteByFilename/{filename} | DELETE | String denoting customers deleted |
 
 _filename should be without the .csv extension_
+
+## Unit Test
+
+Test can be found in the `src/test` directory
+
+1. I tested every code which is written by me.
+2. I have written 20 unit test and try to cover all branchs and lines
+   <a href="https://github.com/rishavmngo/Spring-boot-camel-csv-rest-api"/target/site/jacoco/index.html>Jacoco report</a>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UserAssignment</a> &gt; <a href="index.source.html" class="el_package">com.rishavmngo.UserAssignment.service.impl</a> &gt; <span class="el_source">CustomerServiceImpl.java</span></div><h1>CustomerServiceImpl.java</h1><pre class="source lang-java linenums">package com.rishavmngo.UserAssignment.service.impl;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.rishavmngo.UserAssignment.domain.CustomerEntity;
+import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
+import com.rishavmngo.UserAssignment.repository.CustomerRepository;
+import com.rishavmngo.UserAssignment.service.CustomerService;
+
+import lombok.AllArgsConstructor;
+
+@Service
+@AllArgsConstructor
+public class CustomerServiceImpl implements CustomerService {
+	private CustomerRepository customerRepository;
+
+	// @Override
+	// public void SaveAll(List&lt;CustomerEntity&gt; customers) throws
+	// UniqueConstraintException {
+	//
+	// try {
+	//
+	// List&lt;CustomerEntity&gt; customersSaved = customerRepository.saveAll(customers);
+	// System.out.println(customersSaved.size() + &quot; Customers inserted&quot;);
+	// } catch (Exception e) {
+	//
+	// throw new UniqueConstraintException(&quot;file not found&quot;, e);
+	// }
+	//
+	// }
+
+	@Override
+	public List&lt;CustomerEntity&gt; getAll() {
+<span class="fc" id="L38">		return customerRepository.findAll();</span>
+
+	}
+
+	@Override
+	public void addCustomer(CustomerEntity customer) {
+<span class="fc" id="L44">		Boolean emailExist = customerRepository.findByEmail(customer.getEmail()).isPresent();</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">		if (emailExist) {</span>
+<span class="fc" id="L47">			throw new BadRequestException(</span>
+<span class="fc" id="L48">					&quot;Email &quot; + customer.getEmail() + &quot; taken&quot;);</span>
+
+		}
+
+<span class="fc" id="L52">		customerRepository.save(customer);</span>
+
+<span class="fc" id="L54">	}</span>
+
+	@Override
+	public Optional&lt;CustomerEntity&gt; deleteById(Long id) {
+<span class="fc" id="L58">		Optional&lt;CustomerEntity&gt; optionalCustomer = customerRepository.findById(id);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">		if (optionalCustomer.isPresent()) {</span>
+<span class="fc" id="L60">			customerRepository.deleteById(id);</span>
+		}
+<span class="fc" id="L62">		return optionalCustomer;</span>
+	}
+
+	@Override
+	public int deleteByFilename(String filename) {
+
+<span class="fc" id="L68">		List&lt;CustomerEntity&gt; customers = customerRepository.findByFilename(filename);</span>
+
+<span class="fc" id="L70">		customerRepository.deleteByFilename(filename);</span>
+<span class="fc" id="L71">		return customers.size();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,17 +1,26 @@
 package com.rishavmngo.UserAssignment.routes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.model.rest.RestParamType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
 import com.rishavmngo.UserAssignment.service.CustomerService;
+
+import jakarta.activation.DataHandler;
 
 @Component
 public class CustomerRoutes extends RouteBuilder {

@@ -16,6 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
@@ -85,6 +86,18 @@ public class CustomerServiceTest {
 		underTest.deleteById(id);
 
 		verify(customerRepository).deleteById(id);
+	}
+
+	@Test
+	void canDeleteCustomersByIdIfTest() {
+
+		CustomerEntity customer = CustomersUtils.createTestCustomerEntityA();
+		long id = customer.getId();
+		given(customerRepository.findById(id)).willReturn(Optional.ofNullable((null)));
+
+		underTest.deleteById(id);
+
+		verify(customerRepository, times(0)).deleteById(id);
 	}
 
 	@Test

@@ -1,17 +1,12 @@
 package com.rishavmngo.UserAssignment.routes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
 import org.apache.camel.spi.DataFormat;
-import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.rishavmngo.UserAssignment.domain.CustomerEntity;
-import com.rishavmngo.UserAssignment.exceptions.BadRequestException;
 import com.rishavmngo.UserAssignment.service.CustomerService;
 
 @Component
@@ -80,7 +75,7 @@ public class CustomerCsvRoutes extends RouteBuilder {
 		// customer.setFileName(filename);
 		// exchange.getIn().setBody(customer);
 		// })
-		// .bean(customerService, "addCustomer") // Save each customer individually
+		// .bean(customerService, "addCustomer")
 		// .end();
 
 		from("file:data/inbox?move=.done&moveFailed=.failed")
@@ -88,6 +83,9 @@ public class CustomerCsvRoutes extends RouteBuilder {
 				.setHeader("CamelFileName", simple("${file:name.noext}"))
 				.unmarshal(bind)
 				.split(body()) // Split the list of customers
+				.to("direct:csvFileProcessor");
+
+		from("direct:csvFileProcessor")
 				.process(exchange -> {
 					CustomerEntity customer = exchange.getIn().getBody(CustomerEntity.class);
 					String filename = exchange.getIn().getHeader("CamelFileName", String.class);

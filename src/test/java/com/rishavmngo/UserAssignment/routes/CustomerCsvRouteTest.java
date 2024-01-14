@@ -47,6 +47,7 @@ import com.rishavmngo.UserAssignment.service.CustomerService;
 @SpringBootTest
 @EnableAutoConfiguration
 @ExtendWith(MockitoExtension.class)
+@MockEndpoints("direct:*")
 // @UseAdviceWith
 public class CustomerCsvRouteTest {
 
@@ -61,8 +62,10 @@ public class CustomerCsvRouteTest {
 	// @EndpointInject("mock:result") // Assuming a mock endpoint for testing
 	// private MockEndpoint resultEndpoint;
 
-	// @EndpointInject("mock:file:data/inbox")
 	// private MockEndpoint fileEndpoint;
+
+	@EndpointInject("mock:direct:csvFileProcessor")
+	private MockEndpoints csvFileProcessor;
 	//
 	// @EndpointInject("mock:file:data/inbox.done")
 	// private MockEndpoint doneEndpoint;
@@ -115,61 +118,39 @@ public class CustomerCsvRouteTest {
 
 		doNothing().when(customerService).addCustomer(any());
 
-		// AdviceWith.adviceWith(context, "csv-input", a -> {
-		// a.mockEndpoints("file:*");
-		// a.interceptFrom("file:data/inbox?move=.done&moveFailed=.failed") // Intercept
-		// messages sent to the specified
-		// // file endpoint
-		// .process(e -> {
-		// // Rethrow any BadRequestException to trigger file movement to .failed
-		// if (e.getIn().getBody() instanceof BadRequestException) {
-		// throw (BadRequestException) e.getIn().getBody();
-		// }
-		// });
-		// });
-		//
-		// context.start();
-
-		String file = "customerId,firstName,lastName,email\n1,bill,clinton,bill@gmail.com\n2,elon,musk,musk@gmail.com\n";
-
-		// File newFile = createCsv
-		// producerTemplate.sendBody("file:data/inbox", new
-		// File("data/input/test.csv"));
-
 		producerTemplate.send("file:data/inbox", exchange -> {
 			exchange.getIn().setBody(new File("data/input/test.csv"));
 			exchange.getIn().setHeader("CamelFileName", "test.csv");
 		});
 
-		// resultEndpoint.assertIsSatisfied();
 		Thread.sleep(1000L);
 		assertFileMovedTo("data/inbox/.done/test.csv");
 	}
 
-	void testreal() {
-
-	}
-
+	@Test
 	void testAnother() throws Exception {
 
 		doThrow(new BadRequestException("hello")).when(customerService).addCustomer(any(CustomerEntity.class));
 
-		producerTemplate.send("file:data/inbox", exchange -> {
-			exchange.getIn().setBody(new File("data/input/test.csv"));
+		producerTemplate.send("direct:csvFileProcessor", exchange -> {
+			exchange.getIn().setBody(CustomersUtils.createTestCustomerEntityA());
 			exchange.getIn().setHeader("CamelFileName", "test.csv");
 		});
 
-		Thread.sleep(1000L);
-
-		assertFileMovedTo("data/inbox/.failed/test.csv");
-
+		verify(customerService).addCustomer(any(CustomerEntity.class));
 	}
 
-	private File createTestCsvFile(String path, String content) throws IOException {
-		File file = new File(path);
-		file.getParentFile().mkdirs(); // Create parent directories if needed
-		Files.write(file.toPath(), content.getBytes());
-		return file;
+	@Test
+	void testAnotherOne() throws Exception {
+
+		doNothing().when(customerService).addCustomer(any());
+
+		producerTemplate.send("direct:csvFileProcessor", exchange -> {
+			exchange.getIn().setBody(CustomersUtils.createTestCustomerEntityA());
+			exchange.getIn().setHeader("CamelFileName", "test.csv");
+		});
+
+		verify(customerService).addCustomer(any(CustomerEntity.class));
 	}
 
 	private void assertFileMovedTo(String expectedPath) {

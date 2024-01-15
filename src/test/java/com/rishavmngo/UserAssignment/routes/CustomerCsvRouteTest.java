@@ -13,8 +13,10 @@ import java.util.List;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Configuration;
 import org.apache.camel.EndpointInject;
+import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.RoutesBuilder;
+import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.apache.camel.test.spring.junit5.MockEndpoints;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,9 +36,8 @@ import com.rishavmngo.UserAssignment.service.CustomerService;
 @CamelSpringBootTest
 @SpringBootTest
 @EnableAutoConfiguration
-@ExtendWith(MockitoExtension.class)
 @MockEndpoints("direct:*")
-// @UseAdviceWith
+@ExtendWith(MockitoExtension.class)
 public class CustomerCsvRouteTest {
 
 	private ProducerTemplate producerTemplate;
@@ -47,19 +48,11 @@ public class CustomerCsvRouteTest {
 	@MockBean
 	private CustomerService customerService;
 
-	// @EndpointInject("mock:result") // Assuming a mock endpoint for testing
-	// private MockEndpoint resultEndpoint;
-
-	// private MockEndpoint fileEndpoint;
-
 	@EndpointInject("mock:direct:csvFileProcessor")
-	private MockEndpoints csvFileProcessor;
-	//
-	// @EndpointInject("mock:file:data/inbox.done")
-	// private MockEndpoint doneEndpoint;
-	//
-	// @EndpointInject("mock:file:data/inbox.failed")
-	// private MockEndpoint failedEndpoint;
+	private MockEndpoint mockCsvFileProcessor;
+
+	@EndpointInject("mock:direct:moveFile")
+	private MockEndpoint mockMoveFiles;
 
 	@Configuration
 	static class TestConfig {
@@ -73,6 +66,32 @@ public class CustomerCsvRouteTest {
 	public void setup() {
 
 		producerTemplate = context.createProducerTemplate();
+		mockMoveFiles.reset();
+		mockCsvFileProcessor.reset();
+
+	}
+
+	@Test
+	void testWetherFileComponentMoveFileToFileProcessor() throws Exception {
+
+		File file = new File("data/input/test.csv");
+
+		mockCsvFileProcessor.expectedMessageCount(1);
+		producerTemplate.sendBodyAndHeader("file:data/inbox?noop=true", file, Exchange.FILE_NAME, file.getName());
+
+		mockCsvFileProcessor.assertIsSatisfied();
+
+	}
+
+	@Test
+	void testWeatherANonCsvCallMoveFile() throws Exception {
+
+		File file = new File("data/input/testTwo.csv");
+
+		mockMoveFiles.expectedMessageCount(1);
+		producerTemplate.sendBodyAndHeader("file:data/inbox?noop=true", file, Exchange.FILE_NAME, file.getName());
+
+		mockMoveFiles.assertIsSatisfied();
 
 	}
 
@@ -103,7 +122,6 @@ public class CustomerCsvRouteTest {
 		verify(customerService).addCustomer(any(CustomerEntity.class));
 	}
 
-	@Test
 	void testingFileRoute() throws Exception {
 
 		doNothing().when(customerService).addCustomer(any());
